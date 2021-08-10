@@ -4,7 +4,7 @@ import {
 } from "../models/Pakbon";
 import { Product } from "../models/Product";
 
-const parseVersionOne = ($: cheerio.Root): Pakbon | null => {
+const parseVersionOne = (from: string, $: cheerio.Root): Pakbon | null => {
     let id = $('table > tbody > tr > td > table:nth-child(6) > tbody > tr:nth-child(2) > td:nth-child(2) > strong').text()?.split(':')[1]?.trim();
     let message = cleanString($('table > tbody > tr > td > table:nth-child(6) > tbody > tr:nth-child(2) > td:nth-child(2)').contents()[5]?.data)
 
@@ -13,7 +13,7 @@ const parseVersionOne = ($: cheerio.Root): Pakbon | null => {
     if (id == undefined || message == undefined)
         return null;
 
-    let pakbon = new Pakbon(id, message);
+    let pakbon = new Pakbon(null, from, id, message);
 
     productsContainer.each((index, element) => {
         let elm = $(element);
@@ -36,7 +36,11 @@ const parseVersionOne = ($: cheerio.Root): Pakbon | null => {
             return true;
         }
 
-        let product = new Product(name, amount, price, total_price);
+        if (isNaN(amount)) amount = 0;
+        if (isNaN(price)) price = 0;
+        if (isNaN(total_price)) total_price = 0;
+
+        let product = new Product(name, amount, price, total_price, from);
         pakbon.addProduct(product);
 
         return true;
@@ -45,10 +49,10 @@ const parseVersionOne = ($: cheerio.Root): Pakbon | null => {
     return pakbon;
 }
 
-const Parse = (body: string): Pakbon | null => {
+const Parse = (from: string, body: string): Pakbon | null => {
     let $: cheerio.Root = Cheerio.load(body);
 
-    return parseVersionOne($);
+    return parseVersionOne(from, $);
 };
 
 

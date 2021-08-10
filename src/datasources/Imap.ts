@@ -1,6 +1,7 @@
 import Imap, { Box, ImapFetch, ImapMessage } from 'imap';
 import { MailParser } from 'mailparser';
 import moment from 'moment';
+import ImapFromHeader from '../helpers/ImapFromHeader';
 import { Parse } from '../helpers/PakbonParser';
 import { Pakbon } from '../models/Pakbon';
 
@@ -48,7 +49,7 @@ class ImapListener {
 
     public searchMessages(processedEmailHandler: (pakbon: Pakbon) => void) {
         if (this.imap.state === 'authenticated') {
-            let date: string = moment().subtract(2, 'days').format('DD-MMM-YYYY');
+            let date: string = moment().subtract(4, 'days').format('DD-MMM-YYYY');
             this.imap.search(["UNSEEN", ["SINCE", date], ["FROM", "gedariks@gmail.com"], ["SUBJECT", "Hier is je pakbon"]], (err, results) => {
                 if (err) throw err;
 
@@ -58,8 +59,8 @@ class ImapListener {
                     fetched.on('message', (msg: ImapMessage, seqno: number) => {
                         if (proccessedUids.indexOf(seqno) > -1) return;
                         proccessedUids.push(seqno);
-                        processMessage(msg, seqno).then(mail => {
-                            processedEmailHandler(mail);
+                        processMessage(msg, seqno).then(pakbon => {
+                            processedEmailHandler(pakbon);
                         }).catch(error => {
                             console.warn(`(${seqno}) ` + error);
                         })
@@ -77,11 +78,14 @@ function processMessage(msg: ImapMessage, seqno: number) {
         console.log("Processing msg #" + seqno);
         let body = '';
         let subject = '';
+        let from = '';
         let parser = new MailParser();
     
         parser.on('headers', headers => {
             if (headers.get('subject') != null) {
+                let fromRaw: ImapFromHeader = headers.get('from') as ImapFromHeader;
                 subject = `${headers.get('subject')}`;
+                from = `${fromRaw.value[0]?.address}`;
             }
         });
     
@@ -93,7 +97,7 @@ function processMessage(msg: ImapMessage, seqno: number) {
     
         parser.on('end', () => {
             if (subject.indexOf("Hier is je pakbon") > -1) {
-                let pakbon: Pakbon | null = Parse(body);
+                let pakbon: Pakbon | null = Parse(from, body);
                 if (pakbon != null) {
                     resolve(pakbon);
                 } else {

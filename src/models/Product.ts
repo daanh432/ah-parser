@@ -4,13 +4,15 @@ class Product {
     private price: number;
     private total_price: number;
     private checked: boolean;
+    private from: string;
 
-    constructor(name: string, amount: number, price: number, total_price: number) {
+    constructor(name: string, amount: number, price: number, total_price: number, from: string) {
         this.name = name;
         this.amount = amount;
         this.price = price;
         this.total_price = total_price;
         this.checked = false;
+        this.from = from;
     }
 
 
@@ -37,6 +39,12 @@ class Product {
     public setChecked(checked: boolean) {
         this.checked = checked;
     }
+
+    public getFrom(): string {
+        return this.from;
+    }
 }
 
-export { Product }
+export {
+    Product
+}
