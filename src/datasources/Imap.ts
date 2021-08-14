@@ -16,7 +16,7 @@ class ImapListener {
             throw Error("Imap Listener details are required");
         }
 
-        console.log(`User: ${user} Password: ${password} Host: ${host} Port: ${port} TLS: ${tls}`);
+        console.log(`User: ${user} Password: ****** Host: ${host} Port: ${port} TLS: ${tls}`);
 
         this.imap = new Imap({
             user: user,

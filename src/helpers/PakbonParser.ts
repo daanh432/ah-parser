@@ -23,9 +23,6 @@ const parseVersionOne = (from: string, $: cheerio.Root): Pakbon | null => {
 
         if (elm.children().length != 4) return true;
 
-        console.log();
-
-
         let name = cleanString($(elm.children()[0])?.text());
         let amount = cleanNumber($(elm.children()[1])?.text());
         let price = cleanNumber($(elm.children()[2])?.text());

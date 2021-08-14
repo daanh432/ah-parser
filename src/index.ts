@@ -14,13 +14,11 @@ mysql.connect();
 api.start(3000);
 
 setTimeout(() => {
-    console.log('test');
     imapListener.searchMessages(async (pakbon: Pakbon) => {
         let searchPakbon = await Mysql.getPakbonByOrderNumber(pakbon.getOrderNumber());
         if (searchPakbon != null) return;
         
         Mysql.storePakbon(pakbon);
-        console.log(pakbon);
     });
 }, 5000);
 

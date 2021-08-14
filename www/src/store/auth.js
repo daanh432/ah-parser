@@ -67,9 +67,7 @@ export default {
                         axios.post('/api/v1/refresh', {
                             user_id: userId,
                             remember_token: rememberToken
-                        }).then(response => {
-                            console.log(response.data);
-    
+                        }).then(response => {  
                             const jwtData = parseJwt(response.data.accessToken);
     
                             commit('setToken', {
