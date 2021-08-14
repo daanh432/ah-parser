@@ -19,7 +19,7 @@ export class Api {
         Api.accessTokenSecret = accessTokenSecret;
         this.app = express();
 
-        this.app.use(express.urlencoded());
+        this.app.use(express.urlencoded({extended: false}));
         this.app.use(express.json());
         this.app.use(express.static(resolve(__dirname + '/../www/dist')));
 
