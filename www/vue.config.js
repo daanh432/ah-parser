@@ -42,6 +42,8 @@ module.exports = {
                     handler: 'NetworkFirst',
 
                     options: {
+                        cacheName: 'package_slip_list',
+
                         // Only cache 5 listings.
                         expiration: {
                             maxEntries: 5,
@@ -57,6 +59,8 @@ module.exports = {
                     handler: 'NetworkFirst',
 
                     options: {
+                        cacheName: 'package_slips',
+
                         // Only cache 100 entries.
                         expiration: {
                             maxEntries: 100,
