@@ -58,13 +58,13 @@ const Parse = (from: string, body: string): Pakbon | null => {
 
 const cleanString = (string: string | null | undefined): string | null => {
     if (string == null) return null;
-    return string.replaceAll('\n', '').replace(/\s+/g, ' ').trim();
+    return string.replace(/\n/g, '').replace(/\s+/g, ' ').trim();
 }
 
 const cleanNumber = (string: string | null | undefined): number | null => {
     if (string == null) return null;
 
-    return Math.round(Number.parseFloat(string.replaceAll('\n', '').replace(/\s+/g, ' ').trim()) * 100) / 100;
+    return Math.round(Number.parseFloat(string.replace(/\n/g, '').replace(/\s+/g, ' ').trim()) * 100) / 100;
 }
 
 export {
