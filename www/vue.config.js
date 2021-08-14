@@ -2,9 +2,9 @@
 module.exports = { 
     // ...other vue-cli plugin options...
     pwa: {
-        name: 'AH Parser UI',
-        themeColor: '#4DBA87',
-        msTileColor: '#000000',
+        name: 'AH Parser',
+        themeColor: '#111827',
+        msTileColor: '#111827',
         appleMobileWebAppCapable: 'yes',
         appleMobileWebAppStatusBarStyle: 'black',
 
