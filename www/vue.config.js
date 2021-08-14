@@ -7,6 +7,7 @@ module.exports = {
         msTileColor: '#111827',
         appleMobileWebAppCapable: 'yes',
         appleMobileWebAppStatusBarStyle: 'black',
+        assetsVersion: '2',
 
         // configure the workbox plugin
         workboxOptions: {
