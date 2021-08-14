@@ -11,7 +11,7 @@ const mysql = new Mysql(process.env.MYSQL_HOST, process.env.MYSQL_PORT, process.
 const imapListener = new ImapListener(process.env.IMAP_USER, process.env.IMAP_PASSWORD, process.env.IMAP_HOST, process.env.IMAP_PORT, process.env.IMAP_TLS === "true");
 
 mysql.connect();
-api.start(3000);
+api.start(process.env.PORT ? Number.parseInt(process.env.PORT) : 3000);
 
 setTimeout(() => {
     imapListener.searchMessages(async (pakbon: Pakbon) => {
