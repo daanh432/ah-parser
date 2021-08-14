@@ -2,7 +2,7 @@
     <div v-if="loaded">
         <Header></Header>
         <router-view />
-        <div v-if="!online" class="absolute bottom-0 w-full">
+        <div v-if="!online" class="fixed bottom-0 w-full">
             <div class="container mx-auto items-center">
                 <div class="flex flex-col">
                     <div class="bg-red-200 rounded mx-5 py-3 px-5">
