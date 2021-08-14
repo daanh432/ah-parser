@@ -14,6 +14,4 @@ app.use(router)
 app.component('my-input', input);
 app.component('my-table', table);
 
-axios.defaults.headers.common['Authorization'] = `Bearer ${JSON.parse(localStorage.getItem('access_token') || '{}').access_token || ''}`;
-
 app.mount('#app')

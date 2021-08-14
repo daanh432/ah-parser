@@ -10,11 +10,13 @@ export class User {
     private name: string;
     private email: string;
     private password: string;
+    private remember_token: string | null;
 
     constructor(id: number | null, name: string, email: string, password: string) {
         this.id = id;
         this.name = name;
         this.email = email;
+        this.remember_token = null;
 
         this.password = password;
         if (password != undefined) {
@@ -22,6 +24,31 @@ export class User {
             const hash = pbkdf2Sync(password, salt, ITERATIONS, 64, 'sha512').toString('hex');
             this.password = `${salt}:$:${hash}:$:${ITERATIONS}`;
         }
+    }
+
+    public getRememberToken(): string | null {
+        return this.remember_token;
+    }
+
+    public newRememberToken(): string {
+        const newToken = randomBytes(64).toString('hex');
+
+        Mysql.getConnection((err, connection) => {
+            if (err) {
+                console.error(err);
+                return;
+            }
+
+            connection.query("UPDATE `users` SET `remember_token`=?", [newToken], (err, results) => {
+                connection.release();
+                if (err) {
+                    console.error(err);
+                    return;
+                }
+            });
+        });
+
+        return newToken;
     }
 
     public getId(): number {
@@ -64,6 +91,7 @@ export class User {
                 }
 
                 connection.query("SELECT * FROM `package_slip` WHERE `from_email` = ?", [this.getEmail()], (err, results) => {
+                    connection.release();
                     if (err) {
                         reject(err);
                         return;
@@ -74,7 +102,6 @@ export class User {
                         return;
                     }
 
-                    connection.release();
                     resolve(plainToClass(Pakbon, results as object[]));
                 })
             });

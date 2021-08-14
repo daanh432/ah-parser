@@ -36,16 +36,28 @@ module.exports = {
                 },
                 {
                     // Match any request that starts with /api/v1/fetch
-                    urlPattern: /\..+\/api\/v.\/fetch\/.+$/,
+                    urlPattern: /\..+\/api\/v.\/fetch/,
 
-                    // Apply a cache-first strategy.
-                    handler: 'CacheFirst',
+                    // Apply a network-first strategy.
+                    handler: 'NetworkFirst',
 
                     options: {
-                        // Use a custom cache name.
-                        cacheName: 'data',
+                        // Only cache 5 listings.
+                        expiration: {
+                            maxEntries: 5,
+                            maxAgeSeconds: 31556926
+                        },
+                    },
+                },
+                {
+                    // Match any request that starts with /api/v1/fetch
+                    urlPattern: /\..+\/api\/v.\/fetch\/.+$/,
 
-                        // Only cache 10 images.
+                    // Apply a network-first strategy.
+                    handler: 'NetworkFirst',
+
+                    options: {
+                        // Only cache 100 entries.
                         expiration: {
                             maxEntries: 100,
                             maxAgeSeconds: 31556926

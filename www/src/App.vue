@@ -1,26 +1,38 @@
 <template>
-  <div>
-    <Header></Header>
-    <router-view/>
-  </div>
+    <div v-if="loaded">
+        <Header></Header>
+        <router-view />
+    </div>
 </template>
 
 <script>
-import Header from './components/Header.vue';
+import Header from "./components/Header.vue";
 
 export default {
-  components: {
-    'Header': Header
-  }
-}
+    data() {
+        return {
+            loaded: false
+        }
+    },
+
+    components: {
+        Header: Header
+    },
+
+    beforeCreate() {
+        this.$store.dispatch("auth/load").then(() => {
+            this.loaded = true;
+        });
+    }
+};
 </script>
 
 <style lang="scss">
 #app {
-  font-family: Avenir, Helvetica, Arial, sans-serif;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-  text-align: center;
-  color: #2c3e50;
+    font-family: Avenir, Helvetica, Arial, sans-serif;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    text-align: center;
+    color: #2c3e50;
 }
 </style>

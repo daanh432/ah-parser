@@ -1,4 +1,5 @@
 class Product {
+    private id: number;
     private name: string;
     private amount: number;
     private price: number;
@@ -7,6 +8,7 @@ class Product {
     private from: string;
 
     constructor(name: string, amount: number, price: number, total_price: number, from: string) {
+        this.id = -1;
         this.name = name;
         this.amount = amount;
         this.price = price;
@@ -15,6 +17,9 @@ class Product {
         this.from = from;
     }
 
+    public getId(): number {
+        return this.id;
+    }
 
     public getName(): string {
         return this.name;
