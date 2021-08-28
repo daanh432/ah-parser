@@ -13,12 +13,14 @@ const imapListener = new ImapListener(process.env.IMAP_USER, process.env.IMAP_PA
 mysql.connect();
 api.start(process.env.PORT ? Number.parseInt(process.env.PORT) : 3000);
 
-setTimeout(() => {
+const intervalInMinutes = 5;
+
+setInterval(() => {
     imapListener.searchMessages(async (pakbon: Pakbon) => {
         let searchPakbon = await Mysql.getPakbonByOrderNumber(pakbon.getOrderNumber());
         if (searchPakbon != null) return;
         
         Mysql.storePakbon(pakbon);
     });
-}, 5000);
+}, intervalInMinutes * 60 * 1000);
 
