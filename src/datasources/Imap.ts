@@ -96,7 +96,7 @@ function processMessage(msg: ImapMessage, seqno: number) {
         });
     
         parser.on('end', () => {
-            if (subject.indexOf("Hier is je pakbon") > -1) {
+            if (subject.indexOf("pakbon") > -1) {
                 let pakbon: Pakbon | null = Parse(from, body);
                 if (pakbon != null) {
                     resolve(pakbon);
