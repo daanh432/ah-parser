@@ -24,3 +24,12 @@ setInterval(() => {
     });
 }, intervalInMinutes * 60 * 1000);
 
+process.on('SIGHUP', () => {
+    console.log('Received SIGHUP');
+    imapListener.searchMessages(async (pakbon: Pakbon) => {
+        let searchPakbon = await Mysql.getPakbonByOrderNumber(pakbon.getOrderNumber());
+        if (searchPakbon != null) return;
+        
+        Mysql.storePakbon(pakbon);
+    });
+});
