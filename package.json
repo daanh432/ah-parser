@@ -4,7 +4,7 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "build": "tsc",
+    "build": "tsc -p .",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "author": "daanh432",
@@ -27,7 +27,6 @@
     "class-transformer": "^0.4.0",
     "cors": "^2.8.5",
     "dotenv": "^10.0.0",
-    "enmap": "^5.8.7",
     "express": "^4.17.1",
     "fs": "^0.0.1-security",
     "imap": "^0.8.19",
