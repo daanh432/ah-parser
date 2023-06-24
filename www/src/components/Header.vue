@@ -33,22 +33,22 @@
 </template>
 
 <script>
-    export default {
-        name: 'Header',
+export default {
+    name: 'Header',
 
-        computed: {
-            loggedIn: {
-                get() {
-                    return this.$store.getters['auth/loggedIn'];
-                }
-            }
-        },
-
-        methods: {
-            logout() {
-                this.$store.dispatch('auth/logout');
-                this.$router.push('/');
+    computed: {
+        loggedIn: {
+            get() {
+                return this.$store.getters['auth/loggedIn'];
             }
         }
+    },
+
+    methods: {
+        logout() {
+            this.$store.dispatch('auth/logout');
+            this.$router.push('/');
+        }
     }
+}
 </script>
