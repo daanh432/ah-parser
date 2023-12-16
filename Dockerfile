@@ -1,4 +1,4 @@
-FROM node:18-alpine as deps
+FROM node:20-alpine as deps
 
 WORKDIR /app
 COPY package-lock.json .
@@ -6,7 +6,7 @@ COPY package.json .
 RUN npm ci --omit=dev
 
 # Build backend
-FROM node:18-alpine as compiler
+FROM node:20-alpine as compiler
 WORKDIR /app
 COPY --from=deps /app/node_modules node_modules/
 COPY package-lock.json .
@@ -17,7 +17,7 @@ COPY src/ src/
 RUN npm run build
 
 # Build frontend
-FROM node:16-alpine as webcompiler
+FROM node:20-alpine as webcompiler
 WORKDIR /app/www
 COPY www/package-lock.json .
 COPY www/package.json .
@@ -25,7 +25,7 @@ RUN npm ci
 COPY www/ .
 RUN npm run build
 
-FROM node:18-alpine
+FROM node:20-alpine
 WORKDIR /app
 COPY --from=deps /app/node_modules node_modules/
 COPY --from=compiler /app/dist dist/
