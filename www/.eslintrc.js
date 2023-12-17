@@ -16,6 +16,7 @@ module.exports = {
     "no-unused-vars": ["warn", {
       "ignorePattern": "^_"
     }],
-    indent: ["error", 4]
+    indent: ["error", 4],
+    "vue/multi-word-component-names": "off",
   }
 }
