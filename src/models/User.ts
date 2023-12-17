@@ -3,7 +3,7 @@ import { pbkdf2Sync, randomBytes } from "crypto";
 import { Mysql } from "../datasources/Mysql";
 import { Pakbon } from "./Pakbon";
 
-const ITERATIONS = 10000;
+const ITERATIONS = 600_000;
 
 export class User {
     private id: number | null;
@@ -20,9 +20,7 @@ export class User {
 
         this.password = password;
         if (password != undefined) {
-            const salt = randomBytes(16).toString('hex'); 
-            const hash = pbkdf2Sync(password, salt, ITERATIONS, 64, 'sha512').toString('hex');
-            this.password = `${salt}:$:${hash}:$:${ITERATIONS}`;
+            this.updatePassword(password);
         }
     }
 
@@ -70,6 +68,12 @@ export class User {
         return this.password;
     }
 
+    private updatePassword(password: string): void {
+        const salt = randomBytes(16).toString('hex'); 
+        const hash = pbkdf2Sync(password, salt, ITERATIONS, 64, 'sha512').toString('hex');
+        this.password = `${salt}:$:${hash}:$:${ITERATIONS}`;
+    }
+
     public checkPassword(password: string): boolean {
         const passwordSplit: string[] = this.password.split(':$:');
         if (passwordSplit[0] == null || passwordSplit[1] == null || passwordSplit[2] == null) return false;
@@ -79,7 +83,14 @@ export class User {
 
         let hash = pbkdf2Sync(password, salt, iterations, 64, 'sha512').toString('hex');
 
-        return derivedKey === hash;
+        const valid = derivedKey === hash;
+
+        if (valid && iterations < ITERATIONS) {
+            this.updatePassword(password);
+            Mysql.updateUser(this);
+        }
+
+        return valid;
     }
 
     public getPakbons(): Promise<Pakbon[]> {

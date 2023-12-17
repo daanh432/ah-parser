@@ -224,4 +224,14 @@ export class Mysql {
             })
         });
     }
+
+    public static updateUser(user: User): void {
+        Mysql.getConnection((err, connection) => {
+            if (err) throw err;
+            connection.query("UPDATE `users` SET `name` = ?, `email` = ?, `password` = ? WHERE `id` = ?", [user.getName(), user.getEmail(), user.getPasswordHash(), user.getId()], (err, result) => {
+                if (err) throw err;
+                connection.release();
+            })
+        });
+    }
 }
