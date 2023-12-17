@@ -17,7 +17,7 @@ COPY src/ src/
 RUN npm run build
 
 # Build frontend
-FROM node:16-alpine as webcompiler
+FROM node:20-alpine as webcompiler
 WORKDIR /app/www
 COPY www/package-lock.json .
 COPY www/package.json .
