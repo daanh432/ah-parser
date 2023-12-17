@@ -18,5 +18,6 @@ module.exports = {
     }],
     indent: ["error", 4],
     "vue/multi-word-component-names": "off",
+    "vue/no-reserved-component-names": "off",
   }
 }
