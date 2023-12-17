@@ -10,7 +10,7 @@
   },
   "dependencies": {
     "@tailwindcss/postcss7-compat": "^2.0.2",
-    "autoprefixer": "^9.0.0",
+    "autoprefixer": "^10.0.0",
     "axios": "^1.0.0",
     "body-parser": "^1.19.0",
     "core-js": "^3.6.5",
