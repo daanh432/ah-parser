@@ -75,7 +75,8 @@ export class Api {
                 }
 
                 Mysql.toggleProductById(product.getId(), checked).then(() => {
-                    res.send({data: product, success: true});
+                    product.setChecked(checked);
+                    res.send({data: pakbon, success: true});
                     return;
                 }).catch(err => {
                     console.error(err);

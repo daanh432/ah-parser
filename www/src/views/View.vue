@@ -98,7 +98,7 @@ export default {
             this.intervalId = setInterval(() => {
                 this.fetchData();
             }, 2500); // 2500 milliseconds = 2.5 seconds
-        }
+        },
         fetchData() {
             if (this.intervalId != null) {
                 clearInterval(this.intervalId);
@@ -107,7 +107,7 @@ export default {
             getData(this.$route.params.id)
                 .then(response => {
                     this.pakbon = response.data.data;
-                    startRefresher();
+                    this.startRefresher();
                 })
                 .catch(err => {
                     console.error(err);
@@ -120,7 +120,9 @@ export default {
             clearInterval(this.intervalId);
             axios.post(`/api/v1/toggle/${this.pakbon.id}/${product.id}`, {
                 checked: product.checked ? 'yes' : 'no'
-                startRefresher();
+            }).then(response => {
+                this.pakbon = response.data.data;
+                this.startRefresher();
             }).catch(err => {
                 console.error(err);
             });
