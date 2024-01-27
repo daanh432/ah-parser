@@ -87,20 +87,27 @@ export default {
         };
     },
 
-    mounted() {
-        this.intervalId = setInterval(() => {
-            this.fetchData();
-        }, 2500); // 2500 milliseconds = 2.5 seconds
-    },
     beforeUnmount() {
-        clearInterval(this.intervalId);
+        if (this.intervalId != null) {
+            clearInterval(this.intervalId);
+        }
     },
 
     methods: {
+        startRefresher() {
+            this.intervalId = setInterval(() => {
+                this.fetchData();
+            }, 2500); // 2500 milliseconds = 2.5 seconds
+        }
         fetchData() {
+            if (this.intervalId != null) {
+                clearInterval(this.intervalId);
+            }
+
             getData(this.$route.params.id)
                 .then(response => {
                     this.pakbon = response.data.data;
+                    startRefresher();
                 })
                 .catch(err => {
                     console.error(err);
@@ -110,8 +117,10 @@ export default {
         toggle(product) {
             product.checked = !product.checked;
 
+            clearInterval(this.intervalId);
             axios.post(`/api/v1/toggle/${this.pakbon.id}/${product.id}`, {
                 checked: product.checked ? 'yes' : 'no'
+                startRefresher();
             }).catch(err => {
                 console.error(err);
             });
