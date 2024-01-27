@@ -6,7 +6,6 @@ import store from './store'
 import './assets/tailwind.css'
 import input from './components/Input.vue';
 import table from './components/Table.vue';
-import axios from 'axios'
 
 const app = createApp(App)
 app.use(store);

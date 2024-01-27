@@ -78,9 +78,14 @@ export default {
         itemsParsed: {
             get() {
                 if (this.items == null) return null;
+
+                console.log('moment', moment.unix(1706387157).format('Y-MM-DD HH:mm:ss'));
+
                 return this.items.map(item => {
-                    item.date = moment.unix(item.date).format('Y-MM-DD HH:mm:ss');
-                    return item;
+                    return {
+                        ...item,
+                        date: moment.unix(item.date).format('Y-MM-DD HH:mm:ss')
+                    };
                 });
             }
         }

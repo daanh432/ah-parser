@@ -79,10 +79,10 @@ export default {
                 this.loading = true;
                 axios.post(this.deleteRoute.replace('X_ID_X', id), {
                     '_method': 'DELETE'
-                }).then(_response => {
+                }).then(() => {
                     this.data.splice(this.data.findIndex(i => i.id === id), 1);
                     this.loading = false;
-                }).catch(_ignore => {
+                }).catch(() => {
                     this.loading = false;
                 });
             }

@@ -2,7 +2,7 @@
     <section class="text-gray-400 bg-gray-900 body-font" v-if="pakbon">
         <div class="container mx-auto flex px-0 sm:px-5 py-12 md:flex-row flex-col items-center">
             <div class="flex flex-col mx-auto">
-                <div class="-my-2 overflow-x-auto sm:-mx-6 lg:-mx-8">
+                <div class="-my-2 overflow-x-auto sm:-mx-2 lg:-mx-4">
                     <div class="py-2 align-middle inline-block min-w-full sm:px-6 lg:px-8">
                         <div class="shadow overflow-hidden border-b border-gray-200 sm:rounded-lg bg-white">
                             <h1 class="text-gray-600 font-bold">{{ pakbon.id }} ({{ pakbon.order_number }}) - {{ date }}</h1>
@@ -29,11 +29,11 @@
                                 <tbody class="bg-white divide-y divide-gray-200">
                                     <tr v-for="product in pakbon.products" :key="pakbon.id + '-' + product.name + product.id + '-' + product.checked">
                                         <td class="px-2 py-3 whitespace-normal md:whitespace-nowrap">
-                                            <div class="flex items-center">
-                                                <div class="text-sm font-medium text-gray-900">
-                                                    {{ product.name }}
-                                                </div>
-                                            </div>
+                                            <p class="m-0 p-0 text-sm text-center md:text-left font-medium text-gray-900">
+                                                {{ product.name }} 
+                                                {{ product.status === 'FREE' ? '(FREE)': '' }}
+                                                {{ product.status === 'OUT_OF_STOCK' ? '(OUT OF STOCK)': '' }}
+                                            </p>
                                         </td>
                                         <td class="px-2 py-3 whitespace-normal md:whitespace-nowrap">
                                             <div class="text-sm text-gray-900">
@@ -82,11 +82,31 @@ export default {
 
     data() {
         return {
+            intervalId: null,
             pakbon: null
         };
     },
 
+    mounted() {
+        this.intervalId = setInterval(() => {
+            this.fetchData();
+        }, 2500); // 2500 milliseconds = 2.5 seconds
+    },
+    beforeUnmount() {
+        clearInterval(this.intervalId);
+    },
+
     methods: {
+        fetchData() {
+            getData(this.$route.params.id)
+                .then(response => {
+                    this.pakbon = response.data.data;
+                })
+                .catch(err => {
+                    console.error(err);
+                    this.pakbon = null;
+                });
+        },
         toggle(product) {
             product.checked = !product.checked;
 
@@ -107,37 +127,22 @@ export default {
         }
     },
 
-    beforeRouteEnter(_to, _from, next) {
+    beforeRouteEnter(to, from, next) {
         // called before the route that renders this component is confirmed.
         // does NOT have access to `this` component instance,
         // because it has not been created yet when this guard is called!
         next(vm => {
-            getData(vm.$route.params.id)
-                .then(response => {
-                    vm.pakbon = response.data.data;
-                })
-                .catch(err => {
-                    console.error(err);
-                    this.pakbon = null;
-                });
+            vm.fetchData();
         });
     },
-    beforeRouteUpdate(_to, _from, next) {
+    beforeRouteUpdate(to, from, next) {
         // called when the route that renders this component has changed.
         // This component being reused (by using an explicit `key`) in the new route or not doesn't change anything.
         // For example, for a route with dynamic params `/foo/:id`, when we
         // navigate between `/foo/1` and `/foo/2`, the same `Foo` component instance
         // will be reused (unless you provided a `key` to `<router-view>`), and this hook will be called when that happens.
         // has access to `this` component instance.
-        getData(this.$route.params.id)
-            .then(response => {
-                this.pakbon = response.data.data;
-                next();
-            })
-            .catch(err => {
-                console.err(err);
-                this.pakbon = null;
-            });
-    }
+        this.fetchData();
+    }  
 };
 </script>
