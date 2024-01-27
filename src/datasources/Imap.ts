@@ -50,7 +50,7 @@ class ImapListener {
     public searchMessages(processedEmailHandler: (pakbon: Pakbon) => void) {
         if (this.imap.state === 'authenticated') {
             let date: string = moment().subtract(4, 'days').format('DD-MMM-YYYY');
-            this.imap.search(["UNSEEN", ["SINCE", date], ["FROM", "gedariks@gmail.com"], ["SUBJECT", "pakbon"]], (err, results) => {
+            this.imap.search(["UNSEEN", ["SINCE", date]], (err, results) => {
                 if (err) throw err;
 
                 if (results.length > 0) {
@@ -96,15 +96,11 @@ function processMessage(msg: ImapMessage, seqno: number) {
         });
     
         parser.on('end', () => {
-            if (subject.indexOf("pakbon") > -1) {
-                let pakbon: Pakbon | null = Parse(from, body);
-                if (pakbon != null) {
-                    resolve(pakbon);
-                } else {
-                    reject("Provided mail was of invalid format");
-                }
+            let pakbon: Pakbon | null = Parse(from, subject, body);
+            if (pakbon != null) {
+                resolve(pakbon);
             } else {
-                reject("Not an AH pakbon email");
+                reject("Provided mail was of invalid format");
             }
         });
     

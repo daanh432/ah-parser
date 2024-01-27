@@ -38,7 +38,7 @@ export class Mysql {
                 if (err) throw err;
                 connection.query("CREATE TABLE IF NOT EXISTS `package_slip` ( `id` INT NOT NULL AUTO_INCREMENT , `from_email` VARCHAR(255) NOT NULL , `order_number` VARCHAR(32) NOT NULL , `date` INT UNSIGNED NOT NULL , `message` VARCHAR(255) NOT NULL , PRIMARY KEY (`id`), INDEX `from_email_index` (`from_email`), UNIQUE `order_number_unique` (`order_number`)) ENGINE = InnoDB;", (err, result) => {
                     if (err) throw err;
-                    connection.query("CREATE TABLE IF NOT EXISTS `package_slip_products` ( `id` INT NOT NULL AUTO_INCREMENT , `package_slip_id` INT NOT NULL , `name` VARCHAR(255) NOT NULL , `amount` INT NOT NULL , `price` DOUBLE(10,2) NOT NULL , `total_price` DOUBLE(10,2) NOT NULL , `checked` TINYINT NOT NULL , PRIMARY KEY (`id`)) ENGINE = InnoDB;", (err, result) => {
+                    connection.query("CREATE TABLE IF NOT EXISTS `package_slip_products` ( `id` INT NOT NULL AUTO_INCREMENT , `package_slip_id` INT NOT NULL , `name` VARCHAR(255) NOT NULL , `amount` INT NOT NULL , `price` DOUBLE(10,2) NOT NULL , `total_price` DOUBLE(10,2) NOT NULL , `checked` TINYINT NOT NULL , `status` VARCHAR(100) NOT NULL , PRIMARY KEY (`id`)) ENGINE = InnoDB;", (err, result) => {
                         if (err) throw err;
                         connection.release();
                     });
@@ -160,8 +160,8 @@ export class Mysql {
                     for (let i = 0; i < products.length; i++) {
                         const product: Product | undefined = products[i];
                         if (!product) continue;
-                        connection.query("INSERT INTO `package_slip_products`(`package_slip_id`, `name`, `amount`, `price`, `total_price`, `checked`) VALUES (?, ?, ?, ?, ?, ?)",
-                        [result.insertId, product.getName(), product.getAmount(), product.getPrice(), product.getTotalPrice(), product.getChecked() ? 1 : 0],
+                        connection.query("INSERT INTO `package_slip_products`(`package_slip_id`, `name`, `amount`, `price`, `total_price`, `checked`, `status`) VALUES (?, ?, ?, ?, ?, ?, ?)",
+                        [result.insertId, product.getName(), product.getAmount(), product.getPrice(), product.getTotalPrice(), product.getChecked() ? 1 : 0, product.getStatus().toString()],
                         (err, result) => {
                             if (err)
                                 throw err;
