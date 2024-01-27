@@ -98,10 +98,10 @@ export default {
             if (this.intervalId != null) {
                 clearInterval(this.intervalId);
             }
-            
+
             this.intervalId = setInterval(() => {
                 this.fetchData();
-            }, 2500); // 2500 milliseconds = 2.5 seconds
+            }, 5000); // 5000 milliseconds = 5 seconds
         },
         fetchData() {
             if (this.intervalId != null) {
