@@ -51,7 +51,7 @@ export class ParserV2 extends Parser {
         const data = this.getData($);
         if (data.id == null || data.message == null || data.delivered == null || data.outofstock == null) return false;
         return data.delivered.length > 0
-            && subjects.findIndex(sub => sub.toLowerCase().indexOf(subject.toLowerCase())) > -1;
+            && subjects.find(sub => subject.toLowerCase().indexOf(sub.toLowerCase()) > -1) != null
     }
 
     override parse(from: string, subject: string, $: cheerio.Root): Pakbon | null {
