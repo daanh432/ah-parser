@@ -10,6 +10,11 @@ type DataCacheType = {
     bonus: cheerio.Cheerio;
 }
 
+const subjects = [
+    "Je boodschappen komen eraan",
+    "Je boodschappen zijn ingepakt. Helaas zijn niet alle producten leverbaar"
+];
+
 export class ParserV2 extends Parser {
     public static readonly INSTANCE: Parser = new ParserV2();
 
@@ -45,7 +50,8 @@ export class ParserV2 extends Parser {
     override canParse(from: string, subject: string, $: cheerio.Root): boolean {
         const data = this.getData($);
         if (data.id == null || data.message == null || data.delivered == null || data.outofstock == null) return false;
-        return data.delivered.length > 0;
+        return data.delivered.length > 0
+            && subjects.findIndex(sub => sub.toLowerCase().indexOf(subject.toLowerCase())) > -1;
     }
 
     override parse(from: string, subject: string, $: cheerio.Root): Pakbon | null {
