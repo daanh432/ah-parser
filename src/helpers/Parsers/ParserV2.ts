@@ -60,8 +60,8 @@ export class ParserV2 extends Parser {
         if (data.id == undefined || data.message == undefined)
             return null;
 
-        let pakbon = new Pakbon(null, from, data.id, data.message);
-
+        const timestamp = Math.round(new Date().getTime() / 1000);
+        const pakbon = Pakbon.build({ from_email: from, order_number: data.id, message: data.message, date: timestamp });
 
         const processProduct = (index: number, element: cheerio.Element, status: ProductStatus) => {
             let elm = $(element);
@@ -85,15 +85,15 @@ export class ParserV2 extends Parser {
             if (isNaN(price)) price = 0;
             if (isNaN(totalPrice)) totalPrice = 0;
 
-            let product = new Product(
+            const product = Product.build({
                 name,
+                package_slip_id: -1,
                 amount,
                 price,
-                totalPrice,
-                from,
-                status == ProductStatus.DELIVERED && totalPrice === 0 ? ProductStatus.FREE : status
-            );
-
+                total_price: totalPrice,
+                status: status == ProductStatus.DELIVERED && totalPrice === 0 ? ProductStatus.FREE : status,
+                checked: false
+            });
             pakbon.addProduct(product);
 
             return true;

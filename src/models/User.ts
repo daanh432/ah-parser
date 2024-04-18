@@ -1,51 +1,31 @@
-import { plainToClass } from "class-transformer";
 import { pbkdf2Sync, randomBytes } from "crypto";
-import { Mysql } from "../datasources/Mysql";
 import { Pakbon } from "./Pakbon";
+import { CreationOptional, DataTypes, InferAttributes, InferCreationAttributes, Model } from "sequelize";
+import { sequelize } from "..";
 
 const ITERATIONS = 600_000;
 
-export class User {
-    private id: number | null;
-    private name: string;
-    private email: string;
-    private password: string;
-    private remember_token: string | null;
+const hashPassword = (password: string): string => {
+    const salt = randomBytes(32).toString('hex');
+    const hash = pbkdf2Sync(password, salt, ITERATIONS, 64, 'sha512').toString('hex');
+    return `${salt}:$:${hash}:$:${ITERATIONS}`;
+};
 
-    constructor(id: number | null, name: string, email: string, password: string) {
-        this.id = id;
-        this.name = name;
-        this.email = email;
-        this.remember_token = null;
+export class User extends Model<InferAttributes<User>, InferCreationAttributes<User>> {
+    declare id: CreationOptional<number>;
+    declare name: string;
+    declare email: string;
+    declare password: string;
+    declare remember_token?: string;
 
-        this.password = password;
-        if (password != undefined) {
-            this.updatePassword(password);
-        }
-    }
-
-    public getRememberToken(): string | null {
+    public getRememberToken(): string | undefined {
         return this.remember_token;
     }
 
     public newRememberToken(): string {
         const newToken = randomBytes(64).toString('hex');
-
-        Mysql.getConnection((err, connection) => {
-            if (err) {
-                console.error(err);
-                return;
-            }
-
-            connection.query("UPDATE `users` SET `remember_token`=?", [newToken], (err, results) => {
-                connection.release();
-                if (err) {
-                    console.error(err);
-                    return;
-                }
-            });
-        });
-
+        this.remember_token = newToken;
+        this.save();
         return newToken;
     }
 
@@ -68,13 +48,7 @@ export class User {
         return this.password;
     }
 
-    private updatePassword(password: string): void {
-        const salt = randomBytes(16).toString('hex'); 
-        const hash = pbkdf2Sync(password, salt, ITERATIONS, 64, 'sha512').toString('hex');
-        this.password = `${salt}:$:${hash}:$:${ITERATIONS}`;
-    }
-
-    public checkPassword(password: string): boolean {
+    public async checkPassword(password: string): Promise<boolean> {
         const passwordSplit: string[] = this.password.split(':$:');
         if (passwordSplit[0] == null || passwordSplit[1] == null || passwordSplit[2] == null) return false;
         const salt = passwordSplit[0];
@@ -86,36 +60,46 @@ export class User {
         const valid = derivedKey === hash;
 
         if (valid && iterations < ITERATIONS) {
-            this.updatePassword(password);
-            Mysql.updateUser(this);
+            this.password = hashPassword(password);
+            await this.save();
         }
 
         return valid;
     }
 
     public getPakbons(): Promise<Pakbon[]> {
-        return new Promise((resolve, reject) => {
-            Mysql.getConnection((err, connection) => {
-                if (err) {
-                    reject(err)
-                    return;
-                }
-
-                connection.query("SELECT * FROM `package_slip` WHERE `from_email` = ?", [this.getEmail()], (err, results) => {
-                    connection.release();
-                    if (err) {
-                        reject(err);
-                        return;
-                    }
-
-                    if (results.length === 0) {
-                        resolve([]);
-                        return;
-                    }
-
-                    resolve(plainToClass(Pakbon, results as object[]));
-                })
-            });
-        });
+        return Pakbon.findAll({ where: { from_email: this.email } });
     }
 }
+
+User.init({
+    id: {
+        type: DataTypes.INTEGER,
+        primaryKey: true,
+        autoIncrement: true
+    },
+    name: {
+        type: DataTypes.STRING,
+        allowNull: false
+    },
+    email: {
+        type: DataTypes.STRING,
+        allowNull: false
+    },
+    password: {
+        type: DataTypes.STRING,
+        allowNull: false
+    },
+    remember_token: {
+        type: DataTypes.STRING,
+        allowNull: true
+    }
+}, {
+    sequelize,
+    modelName: 'User'
+});
+
+User.beforeCreate(async (user, options) => {
+    const hashedPassword = hashPassword(user.password);
+    user.password = hashedPassword;
+});
