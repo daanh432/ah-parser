@@ -1,28 +1,28 @@
+import { Association, CreationOptional, DataTypes, InferAttributes, InferCreationAttributes, Model, NonAttribute } from "sequelize";
+import { sequelize } from "..";
+import { Pakbon } from "./Pakbon";
+
 enum ProductStatus {
     DELIVERED = 'DELIVERED',
     FREE = 'FREE',
     OUT_OF_STOCK = 'OUT_OF_STOCK'
 }
 
-class Product {
-    private id: number;
-    private name: string;
-    private amount: number;
-    private price: number;
-    private total_price: number;
-    private checked: boolean;
-    private from: string;
-    private status: ProductStatus
+class Product extends Model<InferAttributes<Product>, InferCreationAttributes<Product>> {
+    declare id: CreationOptional<number>;
 
-    constructor(name: string, amount: number, price: number, total_price: number, from: string, status: ProductStatus) {
-        this.id = -1;
-        this.name = name;
-        this.amount = amount;
-        this.price = price;
-        this.total_price = total_price;
-        this.checked = false;
-        this.from = from;
-        this.status = status;
+    declare package_slip_id: number;
+    declare package_slip: NonAttribute<Pakbon>;
+
+    declare name: string;
+    declare amount: number;
+    declare price: number;
+    declare total_price: number;
+    declare checked: boolean;
+    declare status: ProductStatus
+
+    static override associations: {
+        package_slip: Association<Product, Pakbon>
     }
 
     public getId(): number {
@@ -53,14 +53,61 @@ class Product {
         this.checked = checked;
     }
 
-    public getFrom(): string {
-        return this.from;
-    }
-
     public getStatus(): ProductStatus {
         return this.status;
     }
 }
+
+Product.init({
+    id: {
+        type: DataTypes.INTEGER,
+        primaryKey: true,
+        autoIncrement: true
+    },
+    package_slip_id: {
+        type: DataTypes.INTEGER,
+        allowNull: false
+    },
+    name: {
+        type: DataTypes.STRING,
+        allowNull: false
+    },
+    amount: {
+        type: DataTypes.INTEGER,
+        allowNull: false
+    },
+    price: {
+        type: DataTypes.DOUBLE,
+        allowNull: false
+    },
+    total_price: {
+        type: DataTypes.DOUBLE,
+        allowNull: false
+    },
+    checked: {
+        type: DataTypes.BOOLEAN,
+        allowNull: false
+    },
+    status: {
+        type: DataTypes.STRING,
+        allowNull: false
+    }
+}, {
+    sequelize,
+    modelName: 'Product',
+});
+
+// Participant relationship
+Pakbon.hasMany(Product, {
+    sourceKey: 'id',
+    foreignKey: 'package_slip_id',
+    as: 'products'
+});
+
+Product.belongsTo(Pakbon, {
+    foreignKey: 'package_slip_id',
+    as: 'package_slip'
+});
 
 export {
     ProductStatus,

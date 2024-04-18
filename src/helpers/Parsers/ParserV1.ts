@@ -26,7 +26,8 @@ export class ParserV1 extends Parser {
         if (id == undefined || message == undefined)
             return null;
 
-        let pakbon = new Pakbon(null, from, id, message);
+        const timestamp = Math.round(new Date().getTime() / 1000);
+        const pakbon = Pakbon.build({ from_email: from, order_number: id, message: message, date: timestamp });
 
         productsContainer.each((index, element) => {
             let elm = $(element);
@@ -50,7 +51,15 @@ export class ParserV1 extends Parser {
             if (isNaN(price)) price = 0;
             if (isNaN(total_price)) total_price = 0;
 
-            let product = new Product(name, amount, price, total_price, from, ProductStatus.DELIVERED);
+            const product = Product.build({
+                name,
+                package_slip_id: -1,
+                amount,
+                price,
+                total_price,
+                status: ProductStatus.DELIVERED, checked: false,
+            });
+
             pakbon.addProduct(product);
 
             return true;

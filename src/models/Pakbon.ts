@@ -1,26 +1,19 @@
-import "reflect-metadata";
-import { Type } from "class-transformer";
+import { sequelize } from "..";
 import { Product } from "./Product";
 import { User } from "./User";
-import moment from "moment";
+import { Association, CreationOptional, DataTypes, InferAttributes, InferCreationAttributes, Model, NonAttribute } from "sequelize";
 
-class Pakbon {
-    private id: number;
-    private from_email: string;
-    private order_number: string;
-    private message: string;
-    private date: number;
+class Pakbon extends Model<InferAttributes<Pakbon>, InferCreationAttributes<Pakbon>> {
+    declare id: CreationOptional<number>;
+    declare from_email: string;
+    declare order_number: string;
+    declare message: string;
+    declare date: number;
 
-    @Type(() => Product)
-    private products: Product[];
+    declare products: NonAttribute<Product[]>;
 
-    constructor(id: number | null, from_email: string, order_number: string, message: string) {
-        this.id = id ? id : -1;
-        this.from_email = from_email;
-        this.order_number = order_number;
-        this.message = message;
-        this.products = [];
-        this.date = moment().unix();
+    static override associations: {
+        products: Association<Pakbon, Product>
     }
 
     public getId(): number {
@@ -44,6 +37,7 @@ class Pakbon {
     }
 
     public addProduct(product: Product): void {
+        if (this.products == null) this.products = new Array<Product>();
         this.products.push(product);
     }
 
@@ -54,6 +48,37 @@ class Pakbon {
     public getDateUnix(): number {
         return this.date;
     }
+
+    public getDate(): Date {
+        return new Date(this.date);
+    }
 }
+
+Pakbon.init({
+    id: {
+        type: DataTypes.INTEGER,
+        primaryKey: true,
+        autoIncrement: true
+    },
+    from_email: {
+        type: DataTypes.STRING,
+        allowNull: false
+    },
+    order_number: {
+        type: DataTypes.STRING,
+        allowNull: false
+    },
+    message: {
+        type: DataTypes.STRING,
+        allowNull: false
+    },
+    date: {
+        type: DataTypes.INTEGER,
+        allowNull: false
+    }
+}, {
+    sequelize,
+    modelName: 'Pakbon'
+});
 
 export { Pakbon }
