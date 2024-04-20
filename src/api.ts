@@ -37,7 +37,10 @@ export class Api {
 
             Pakbon.findOne({
                 where: { id: req.params.id },
-                include: [Pakbon.associations.products]
+                include: [Pakbon.associations.products],
+                order: [
+                    [Pakbon.associations.products, 'name', 'DESC'],
+                ],
             }).then(pakbon => {
                 if (!pakbon || pakbon.getFromEmail() !== req.user.getEmail()) {
                     res.status(404).send({ success: false, message: 'Not found' });
@@ -80,7 +83,13 @@ export class Api {
                 try {
                     product.checked = checked;
                     await product.save();
-                    res.send({ data: pakbon.reload({ include: [Pakbon.associations.products] }), success: true });
+                    await pakbon.reload({
+                        include: [Pakbon.associations.products],
+                        order: [
+                            [Pakbon.associations.products, 'name', 'DESC'],
+                        ],
+                    });
+                    res.send({ data: pakbon, success: true });
                 } catch (err) {
                     console.error(err);
                     res.status(500).send({ success: false, message: 'Internal server error' });
