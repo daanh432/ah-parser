@@ -7,9 +7,11 @@ import RequestWithUser from "./helpers/RequestWithUser";
 import { Product } from "./models/Product";
 import { User } from "./models/User";
 import { Pakbon } from "./models/Pakbon";
+import { OrderItem, Sequelize } from "sequelize";
 
 const EXPIRE_TIME = 60 * 60 * 2;
 const REGISTER_ENABLED = true;
+const PRODUCT_SORT: OrderItem = [Sequelize.fn('upper', Sequelize.col('products.name')), 'ASC'];
 
 export class Api {
     private static accessTokenSecret: string;
@@ -39,7 +41,7 @@ export class Api {
                 where: { id: req.params.id },
                 include: [Pakbon.associations.products],
                 order: [
-                    [Pakbon.associations.products, 'name', 'DESC'],
+                    PRODUCT_SORT
                 ],
             }).then(pakbon => {
                 if (!pakbon || pakbon.getFromEmail() !== req.user.getEmail()) {
@@ -86,7 +88,7 @@ export class Api {
                     await pakbon.reload({
                         include: [Pakbon.associations.products],
                         order: [
-                            [Pakbon.associations.products, 'name', 'DESC'],
+                            PRODUCT_SORT,
                         ],
                     });
                     res.send({ data: pakbon, success: true });
