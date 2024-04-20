@@ -4,7 +4,7 @@ import { Product } from "./models/Product";
 
 export const startTimer = () => {
     const imapListener = new ImapListener(process.env.IMAP_USER, process.env.IMAP_PASSWORD, process.env.IMAP_HOST, process.env.IMAP_PORT, process.env.IMAP_TLS === "true");
-    const intervalInMinutes = 1440;
+    const intervalInMinutes = 5;
 
     const searchPakbon = async () => {
         imapListener.searchMessages(async (pakbon: Pakbon) => {
